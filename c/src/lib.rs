@@ -1,3 +1,15 @@
+//! The `browser-window-c` crate provides a C interface to any browser engine - and windowing API implementations that are not available in Rust.
+//! This is not called `browser-window-sys`, because it is not a FFI binding crate of one external C library.
+//! 
+//! Each 'type object' has a handle type, which is supposed to be used as a pointer. (E.g. `bw_Application*` for the application functionality.)
+//! Each handle type makes use of an 'subtype' postfixed with `Impl`, like `bw_ApplicationImpl`, which is a member of `bw_Application` itself.
+//! Within this implementations' subtype can be stored any variables that that implementation needs to hold.
+//! 
+//! These implementations are then written in code files contained within a directory of the main type object.
+//! So for example, the `application` directory contains `win32.c`, `gtk.c`, `cef.cpp` and `cef_window.cpp`, which all implement a part of the application type if their corresponding implementation is selected.
+//! Then, there is also a `common.c` file in that directory, which implements any functionality that is implemented the same for any implementation.
+//! So there is no need for redundancy.
+
 mod bindings;
 
 use std::{
