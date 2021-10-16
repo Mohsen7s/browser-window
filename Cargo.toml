@@ -15,6 +15,7 @@ repository = "https://github.com/bamilab/browser-window/"
 [features]
 default = ["cef"]
 cef = ["browser-window-core/cef"]
+cef-window = ["browser-window-core/cef-window"]
 gtk = ["browser-window-core/gtk"]
 threadsafe = []
 

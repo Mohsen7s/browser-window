@@ -194,7 +194,7 @@ fn main() {
 		}
 	}
 	// Non-windows systems that opt for using CEF, use CEF's own internal windowing features
-	else if cfg!(feature = "cef") && !target.contains("windows") {
+	else if cfg!(feature = "cef-windows") || (cfg!(feature = "cef") && !target.contains("windows")) {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
 		build
 			.file("src/application/cef_window.cpp")

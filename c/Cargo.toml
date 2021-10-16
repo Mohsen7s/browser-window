@@ -12,6 +12,7 @@ repository = "https://github.com/bamilab/browser-window/tree/master/c"
 [features]
 default = ["cef"]
 cef = []
+cef-window = ["cef"]
 gtk = []
 
 [lib]
