@@ -8,7 +8,7 @@ use crate::prelude::*;
 
 
 
-pub trait WindowExt: Copy + Default {
+pub trait WindowCore: Copy + Default {
 	fn app( &self ) -> ApplicationImpl;
 
 	fn destroy( &self );

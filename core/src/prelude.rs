@@ -11,9 +11,9 @@ pub struct Pos2D(pub(crate) cbw_Pos2D);
 
 
 
-pub use crate::application::{ApplicationExt, ApplicationImpl};
-pub use crate::browser_window::{BrowserWindowExt, BrowserWindowImpl};
-pub use crate::window::{WindowExt, WindowImpl};
+pub use crate::application::{ApplicationCore, ApplicationImpl};
+pub use crate::browser_window::{BrowserWindowCore, BrowserWindowImpl};
+pub use crate::window::{WindowCore, WindowImpl};
 
 
 

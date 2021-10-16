@@ -1,7 +1,7 @@
 //! This module implements the `Application` trait with the corresponding function definitions found in the C code base of `browser-window-c`.
 //! All functions are basically wrapping the FFI provided by crate `browser-window-c`.
 
-use super::{ApplicationExt, ApplicationSettings};
+use super::*;
 
 use crate::{
 	error::*
@@ -22,7 +22,7 @@ pub struct ApplicationImpl {
 	pub(in crate) inner: *mut cbw_Application
 }
 
-impl ApplicationExt for ApplicationImpl {
+impl ApplicationCore for ApplicationImpl {
 
 	fn assert_correct_thread( &self ) {
 		unsafe { cbw_Application_assertCorrectThread( self.inner ) }

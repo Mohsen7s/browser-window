@@ -45,7 +45,7 @@ struct CookieIteratorNextCallbackData {
 
 
 
-impl CookieExt for CookieImpl {
+impl CookieCore for CookieImpl {
 
 	fn creation_time(&self) -> SystemTime {
 		let timestamp = unsafe { cbw_Cookie_getCreationTime(self.inner) };
@@ -177,7 +177,7 @@ impl CookieExt for CookieImpl {
 	}
 }
 
-impl CookieJarExt for CookieJarImpl {
+impl CookieJarCore for CookieJarImpl {
 
 	fn delete(&mut self, url: &str, name: &str, complete_cb: CookieDeleteCallbackFn, cb_data: *mut ()) {
 		let data = Box::into_raw(Box::new(CookieDeleteCallbackData {
@@ -243,7 +243,7 @@ impl CookieJarExt for CookieJarImpl {
 	}
 }
 
-impl CookieIteratorExt for CookieIteratorImpl {
+impl CookieIteratorCore for CookieIteratorImpl {
 	fn free(&mut self) {
 		unsafe { cbw_CookieIterator_free(self.inner) }
 	}

@@ -56,7 +56,7 @@ type UsizeFix = u64;
 
 
 
-impl BrowserWindowExt for BrowserWindowImpl {
+impl BrowserWindowCore for BrowserWindowImpl {
 
 	fn cookie_jar(&self) -> CookieJarImpl {
 		let inner = unsafe { cbw_CookieJar_newGlobal() };

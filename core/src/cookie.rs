@@ -16,7 +16,7 @@ pub type CookieStorageCallbackFn = unsafe fn( cj: CookieJarImpl, data: *mut (), 
 pub type CookieDeleteCallbackFn = unsafe fn(cj: CookieJarImpl, data: *mut (), deleted: usize);
 pub type CookieIteratorNextCallbackFn = unsafe fn(cj: CookieIteratorImpl, data: *mut (), Option<CookieImpl>);
 
-pub trait CookieExt {
+pub trait CookieCore {
 	fn new(name: &str, value: &str) -> CookieImpl;
 
 	fn creation_time(&self) -> SystemTime;
@@ -39,7 +39,7 @@ pub trait CookieExt {
 	fn set_value(&mut self, value: &str) -> &mut Self;
 }
 
-pub trait CookieJarExt {
+pub trait CookieJarCore {
 	fn delete(&mut self, url: &str, name: &str, complete_cb: CookieDeleteCallbackFn, cb_data: *mut ());
 	fn free(&mut self);
 	fn global() -> CookieJarImpl;
@@ -48,7 +48,7 @@ pub trait CookieJarExt {
 	fn store(&mut self, url: &str, cookie: &CookieImpl, success_cb: Option<CookieStorageCallbackFn>, cb_data: *mut ());
 }
 
-pub trait CookieIteratorExt {
+pub trait CookieIteratorCore {
 	fn free(&mut self);
 	fn next(&mut self, on_next: CookieIteratorNextCallbackFn, cb_data: *mut ()) -> bool;
 }

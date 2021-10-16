@@ -13,7 +13,7 @@ use std::{
 
 
 
-pub trait ApplicationExt: Copy {
+pub trait ApplicationCore: Copy {
 	/// Asserts if not on the GUI thread
 	fn assert_correct_thread( &self );
 	/// Dispatches work to be executed on the GUI thread.

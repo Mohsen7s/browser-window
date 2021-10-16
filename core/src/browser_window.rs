@@ -22,7 +22,7 @@ pub type CreationCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut () );
 pub type EvalJsCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut (), result: Result<String, JsEvaluationError> ); 
 pub type ExternalInvocationHandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
 
-pub trait BrowserWindowExt: Copy {
+pub trait BrowserWindowCore: Copy {
 
 	fn cookie_jar(&self) -> CookieJarImpl;
 

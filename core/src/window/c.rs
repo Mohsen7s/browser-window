@@ -1,10 +1,7 @@
 //! This module implements the `Window` trait with the corresponding function definitions found in the C code base of `browser-window-c`.
 //! All functions are basically wrapping the FFI provided by crate `browser-window-c`.
 
-use super::{
-	WindowExt,
-	WindowOptions
-};
+use super::*;
 
 use crate::{
 	application::ApplicationImpl,
@@ -64,7 +61,7 @@ impl WindowImpl {
 	}
 }
 
-impl WindowExt for WindowImpl {
+impl WindowCore for WindowImpl {
 
 	fn app( &self ) -> ApplicationImpl {
 		ApplicationImpl { inner: unsafe { (*self.inner).app } }
