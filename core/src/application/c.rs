@@ -4,8 +4,7 @@
 use super::{ApplicationExt, ApplicationSettings};
 
 use crate::{
-	error::*,
-	prelude::*
+	error::*
 };
 
 use std::{
@@ -13,6 +12,8 @@ use std::{
 	ptr,
 	time::Duration
 };
+
+use browser_window_c::*;
 
 
 

@@ -16,6 +16,8 @@ use std::{
 	ptr
 };
 
+use browser_window_c::*;
+
 
 
 #[derive(Clone,Copy)]

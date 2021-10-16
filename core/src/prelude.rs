@@ -1,6 +1,8 @@
-pub use browser_window_c::*;
+use browser_window_c::*;
 
 pub use crate::cookie::*;
+// TODO: Wrap this type as well
+pub use browser_window_c::cbw_WindowOptions;
 
 
 

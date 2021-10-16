@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use browser_window_c::*;
 
 use std::{
 	ffi::CStr,

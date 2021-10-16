@@ -2,6 +2,8 @@ pub mod c;
 
 pub use c::WindowImpl;
 
+use browser_window_c::*;
+
 use crate::prelude::*;
 
 
