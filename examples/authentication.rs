@@ -2,7 +2,6 @@
 
 use browser_window::application::*;
 use browser_window::browser::*;
-use browser_window::prelude::*;
 
 use std::time::Duration;
 

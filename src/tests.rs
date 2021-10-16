@@ -1,7 +1,6 @@
 use crate::application::*;
 use crate::browser::*;
 use crate::cookie::*;
-use crate::prelude::*;
 
 use std::{
 	env,

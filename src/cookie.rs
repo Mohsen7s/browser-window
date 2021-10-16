@@ -4,8 +4,10 @@ use browser_window_core::cookie::*;
 use futures_channel::oneshot;
 
 use std::{
+	borrow::Cow,
 	marker::PhantomData,
-	ops::*
+	ops::*,
+	time::SystemTime
 };
 
 
@@ -32,19 +34,55 @@ impl Cookie {
 	pub fn new(name: &str, value: &str) -> Self {
 		Self { inner: CookieImpl::new(name, value) }
 	}
-}
 
-impl Deref for Cookie {
-	type Target = CookieImpl;
-
-	fn deref(&self) -> &Self::Target {
-		&self.inner
+	pub fn creation_time(&self) -> SystemTime {
+		self.inner.creation_time()
 	}
-}
-
-impl DerefMut for Cookie {
-	fn deref_mut(&mut self) -> &mut Self::Target {
-		&mut self.inner
+	pub fn expires(&self) -> Option<SystemTime> {
+		self.inner.expires()
+	}
+	pub fn domain<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.domain()
+	}
+	pub fn is_http_only(&self) -> bool {
+		self.inner.is_http_only()
+	}
+	pub fn name<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.name()
+	}
+	pub fn path<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.path()
+	}
+	pub fn is_secure(&self) -> bool {
+		self.inner.is_secure()
+	}
+	pub fn value<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.value()
+	}
+	
+	pub fn make_http_only(&mut self) -> &mut Self {
+		self.inner.make_http_only(); self
+	}
+	pub fn make_secure(&mut self) -> &mut Self {
+		self.inner.make_secure(); self
+	}
+	pub fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self {
+		self.inner.set_creation_time(time); self
+	}
+	pub fn set_expires(&mut self, time: &SystemTime) -> &mut Self {
+		self.inner.set_expires(time); self
+	}
+	pub fn set_domain(&mut self, domain: &str) -> &mut Self {
+		self.inner.set_domain(domain); self
+	}
+	pub fn set_name(&mut self, name: &str) -> &mut Self {
+		self.inner.set_name(name); self
+	}
+	pub fn set_path(&mut self, path: &str) -> &mut Self {
+		self.inner.set_path(path); self
+	}
+	pub fn set_value(&mut self, value: &str) -> &mut Self {
+		self.inner.set_value(value); self
 	}
 }
 
