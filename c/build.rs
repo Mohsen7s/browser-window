@@ -198,7 +198,7 @@ fn main() {
 		bgbuilder = bgbuilder.clang_arg("-DBW_CEF_WINDOW");
 		build
 			.file("src/application/cef_window.cpp")
-			.file("src/window/cef.cpp")
+			.file("src/window/cef_window.cpp")
 			.define("BW_CEF_WINDOW", None);
 		build_se
 			.define("BW_CEF_WINDOW", None);

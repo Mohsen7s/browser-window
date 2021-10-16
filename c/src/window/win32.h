@@ -13,6 +13,12 @@
 
 
 
+typedef struct {
+	HWND handle;
+	DWORD style;
+	BYTE opacity;
+} bw_WindowImpl;
+
 struct bw_WindowDispatchData {
 	bw_WindowDispatchFn func;
 	bw_Window* window;

@@ -12,11 +12,11 @@ extern "C" {
 #ifndef BW_BINDGEN
 
 #if defined(BW_WIN32)
-#include "win32/window.h"	// TODO: Make this "window/win32.h"
+#include "window/win32.h"
 #elif defined(BW_GTK)
 #include "window/gtk.h"
 #elif defined(BW_CEF_WINDOW)
-#include "window/cef.h"
+#include "window/cef_window.h"
 #else
 #error Unsupported window API implementation
 #endif
