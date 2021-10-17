@@ -110,10 +110,17 @@ impl BrowserWindowBuilder {
 	}
 
 	/// Sets whether or not an extra window with developer tools will be opened together with this browser.
-	/// When in debug mode the default is `true`.
-	/// When in release mode the default is `false`.
+	/// The default is `false`.
 	pub fn dev_tools( &mut self, enabled: bool ) -> &mut Self {
 		self.dev_tools = enabled;	self
+	}
+
+	/// Like [`dev_tools`], but only sets dev tools to be enabled (or disabled) if compiling for debug target. 
+	pub fn dev_tools_debug(&mut self, enabled: bool) -> &mut Self {
+		#[cfg(debug_assertions)]
+		self.dev_tools(enabled);
+
+		self
 	}
 
 	/*pub fn handler<H>( &mut self, mut handler: H ) -> &Self where
