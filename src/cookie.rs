@@ -12,22 +12,21 @@ use std::{
 
 
 
+/// Cookie data.
 pub struct Cookie {
 	inner: CookieImpl
 }
 
-//pub struct CookieMut (Cookie);
-
+/// The cookie store.
 pub struct CookieJar {
 	inner: CookieJarImpl
 }
 
+/// An 'async iterator' for cookies.
 pub struct CookieIterator<'a> {
 	inner: CookieIteratorImpl,
 	_phantom: PhantomData<&'a u8>
 }
-
-//pub struct CookieIteratorMut<'a> (CookieIterator<'a>);
 
 
 impl Cookie {
