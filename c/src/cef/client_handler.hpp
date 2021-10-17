@@ -3,11 +3,13 @@
 
 #include <include/cef_client.h>
 #include <include/cef_life_span_handler.h>
+#include <include/cef_load_handler.h>
 #include <include/cef_v8.h>
 #include <string>
 #include <vector>
 
 #include "bw_handle_map.hpp"
+#include "util.hpp"
 #include "../application.h"
 #include "../common.h"
 
@@ -19,7 +21,7 @@ struct ExternalInvocationHandlerData {
 	std::vector<std::string> params;
 };
 
-class ClientHandler : public CefClient, public CefLifeSpanHandler {
+class ClientHandler : public CefClient, public CefLifeSpanHandler, CefLoadHandler {
 
 	bw_Application* app;
 
@@ -28,6 +30,46 @@ public:
 
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
 		return this;
+	}
+
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override {
+		return this;
+	}
+
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int http_status_code) override {
+		bw_BrowserWindow* bw = bw::bw_handle_map.fetch(browser).value();
+
+		if (bw->callbacks.on_load != 0) {
+			BW_ERR_DECLARE_SUCCESS(error);
+			bw->callbacks.on_load(bw, http_status_code, error);
+		}
+	}
+
+	virtual void OnLoadError(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		ErrorCode error_code,
+		const CefString& error_text,
+		const CefString& failed_url
+	) override {
+		bw_BrowserWindow* bw = bw::bw_handle_map.fetch(browser).value();
+
+		if (bw->callbacks.on_load != 0) {
+			// Convert error message to bw_Err
+			char* c_error_text;
+			bw_cef_copyToCstr(error_text, &c_error_text);
+			bw_Err error = bw_Err_new_with_msg(error_code, c_error_text);
+			bw_string_freeCstr(c_error_text);
+			
+			bw->callbacks.on_load(bw, 0, error);
+		}
+	}
+
+	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transition_type) override {
+		bw_BrowserWindow* bw = bw::bw_handle_map.fetch(browser).value();
+
+		if (bw->callbacks.on_load_start != 0)
+			bw->callbacks.on_load_start(bw);
 	}
 
 	virtual bool OnProcessMessageReceived(

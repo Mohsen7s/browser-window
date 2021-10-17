@@ -30,6 +30,11 @@ typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* us
 
 
 
+typedef struct {
+	void (*on_load)(bw_BrowserWindow*, int, bw_Err);
+	void (*on_load_start)(bw_BrowserWindow*);
+} bw_BrowserWindowCallbacks;
+
 typedef struct bw_BrowserWindowOptions {
 	BOOL dev_tools;
 	bw_CStrSlice resource_path;
@@ -46,6 +51,7 @@ struct bw_BrowserWindow {
 	bw_Window* window;
 	bw_BrowserWindowHandlerFn external_handler;
 	void* user_data;
+	bw_BrowserWindowCallbacks callbacks;
 	bw_BrowserWindowImpl impl;
 };
 

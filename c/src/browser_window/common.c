@@ -54,6 +54,7 @@ void bw_BrowserWindow_new(
 	browser->window->callbacks.do_cleanup = bw_BrowserWindowImpl_doCleanup;
 	browser->external_handler = handler;
 	browser->user_data = user_data;
+	memset(&browser->callbacks, 0, sizeof(bw_BrowserWindowCallbacks));
 
 
 	bw_BrowserWindowImpl_new(
