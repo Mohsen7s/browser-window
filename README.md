@@ -56,9 +56,9 @@ If you want to help out, you're more than welcome!
 
 ## Future Plans
 
-At the moment, there is a decent set of functionality available, but if something is lacking, please [submit an issue](https://github.com/bamilab/browser-window/issues), and I'll take a look at it.
+At the moment, there is a decent set of functionality available, but if you require an feature that is unavailable, please [submit an issue](https://github.com/bamilab/browser-window/issues), and I'll look into it.
 
-Otherwise, there are some things that are yet to come:
+Otherwise, there are some things planned for the future:
 
 * Events [underway]
 * Servo engine support (currently missing good embedding support)
