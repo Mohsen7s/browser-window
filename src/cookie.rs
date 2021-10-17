@@ -37,51 +37,65 @@ impl Cookie {
 	pub fn creation_time(&self) -> SystemTime {
 		self.inner.creation_time()
 	}
-	pub fn expires(&self) -> Option<SystemTime> {
-		self.inner.expires()
-	}
+
 	pub fn domain<'a>(&'a self) -> Cow<'a, str> {
 		self.inner.domain()
 	}
+	
+	pub fn expires(&self) -> Option<SystemTime> {
+		self.inner.expires()
+	}
+
 	pub fn is_http_only(&self) -> bool {
 		self.inner.is_http_only()
 	}
-	pub fn name<'a>(&'a self) -> Cow<'a, str> {
-		self.inner.name()
-	}
-	pub fn path<'a>(&'a self) -> Cow<'a, str> {
-		self.inner.path()
-	}
+
 	pub fn is_secure(&self) -> bool {
 		self.inner.is_secure()
-	}
-	pub fn value<'a>(&'a self) -> Cow<'a, str> {
-		self.inner.value()
 	}
 	
 	pub fn make_http_only(&mut self) -> &mut Self {
 		self.inner.make_http_only(); self
 	}
+
 	pub fn make_secure(&mut self) -> &mut Self {
 		self.inner.make_secure(); self
 	}
+
+	pub fn name<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.name()
+	}
+
+	pub fn path<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.path()
+	}
+
 	pub fn set_creation_time(&mut self, time: &SystemTime) -> &mut Self {
 		self.inner.set_creation_time(time); self
 	}
-	pub fn set_expires(&mut self, time: &SystemTime) -> &mut Self {
-		self.inner.set_expires(time); self
-	}
+
 	pub fn set_domain(&mut self, domain: &str) -> &mut Self {
 		self.inner.set_domain(domain); self
 	}
+
+	pub fn set_expires(&mut self, time: &SystemTime) -> &mut Self {
+		self.inner.set_expires(time); self
+	}
+
 	pub fn set_name(&mut self, name: &str) -> &mut Self {
 		self.inner.set_name(name); self
 	}
+
 	pub fn set_path(&mut self, path: &str) -> &mut Self {
 		self.inner.set_path(path); self
 	}
+
 	pub fn set_value(&mut self, value: &str) -> &mut Self {
 		self.inner.set_value(value); self
+	}
+
+	pub fn value<'a>(&'a self) -> Cow<'a, str> {
+		self.inner.value()
 	}
 }
 
@@ -142,14 +156,6 @@ impl CookieJar {
 	/// Like `clear`, but with `url` set empty.
 	pub async fn clear_all(&mut self) -> usize {
 		self.clear("").await
-	}
-
-	fn _delete<H>(&mut self, url: &str, name: &str, on_complete: H) where
-		H: FnOnce(usize)
-	{
-		let data = Box::into_raw(Box::new(on_complete));
-
-		self.inner.delete(url, name, cookie_delete_callback::<H>, data as _);
 	}
 
 	/// Deletes all cookies with the given `name`.
@@ -236,14 +242,6 @@ impl CookieJar {
 		}
 	}
 
-	fn _store<'a,H>(&mut self, url: &str, cookie: &Cookie, on_complete: H) where
-		H: FnOnce(Result<(), CookieStorageError>) + 'a
-	{
-		let data = Box::into_raw(Box::new(on_complete));
-
-		self.inner.store(url.into(), &cookie.inner, Some(cookie_store_callback::<'a,H>), data as _);
-	}
-
 	/// Stores the given `cookie` for the given `url`.
 	pub async fn store(&mut self, url: &str, cookie: &Cookie) -> Result<(), CookieStorageError> {
 		let (tx, rx) = oneshot::channel::<Result<(), CookieStorageError>>();
@@ -253,6 +251,22 @@ impl CookieJar {
 		});
 
 		rx.await.unwrap()
+	}
+
+	fn _delete<H>(&mut self, url: &str, name: &str, on_complete: H) where
+		H: FnOnce(usize)
+	{
+		let data = Box::into_raw(Box::new(on_complete));
+
+		self.inner.delete(url, name, cookie_delete_callback::<H>, data as _);
+	}
+
+	fn _store<'a,H>(&mut self, url: &str, cookie: &Cookie, on_complete: H) where
+		H: FnOnce(Result<(), CookieStorageError>) + 'a
+	{
+		let data = Box::into_raw(Box::new(on_complete));
+
+		self.inner.store(url.into(), &cookie.inner, Some(cookie_store_callback::<'a,H>), data as _);
 	}
 }
 
@@ -273,15 +287,6 @@ unsafe fn cookie_delete_callback<'a, H>(_handle: CookieJarImpl, cb_data: *mut ()
 	(*data)( deleted );
 }
 
-unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut (), result: Result<(), CookieStorageError> ) where
-	H: FnOnce(Result<(), CookieStorageError>) + 'a
-{
-	let data_ptr = cb_data as *mut H;
-	let data: Box<H> = Box::from_raw( data_ptr );
-
-	(*data)( result );
-}
-
 unsafe fn cookie_iterator_next_handler<H>(_handle: CookieIteratorImpl, cb_data: *mut (), cookie: Option<CookieImpl>) where
 	H: FnOnce(Option<Cookie>)
 {
@@ -289,4 +294,13 @@ unsafe fn cookie_iterator_next_handler<H>(_handle: CookieIteratorImpl, cb_data: 
 	let data: Box<H> = Box::from_raw(data_ptr);
 
 	(*data)(cookie.map(|c| Cookie {inner: c}));
+}
+
+unsafe fn cookie_store_callback<'a, H>( _handle: CookieJarImpl, cb_data: *mut (), result: Result<(), CookieStorageError> ) where
+	H: FnOnce(Result<(), CookieStorageError>) + 'a
+{
+	let data_ptr = cb_data as *mut H;
+	let data: Box<H> = Box::from_raw( data_ptr );
+
+	(*data)( result );
 }
