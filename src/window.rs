@@ -3,7 +3,8 @@
 mod builder;
 
 use super::prelude::*;
-use super::event::Event;
+
+use browser_window_core::event::Event;
 
 
 
@@ -11,7 +12,7 @@ pub use builder::WindowBuilder;
 
 
 
-pub type StandardWindowEvent = Event<'static, WindowHandle>;
+pub type WindowEvent<T> = Event<'static, WindowHandle, T>;
 
 /// A handle that exposes all windowing functionality.
 #[derive(Clone, Copy)]
@@ -21,9 +22,9 @@ pub struct WindowHandle {
 
 #[derive(Default)]
 pub(in crate) struct WindowEvents {
-	pub on_close: StandardWindowEvent,
-	pub on_destroy: StandardWindowEvent,
-	pub on_resize: Event<'static, WindowResizeEventArgs>
+	pub on_close: WindowEvent<()>,
+	pub on_destroy: WindowEvent<()>,
+	pub on_resize: WindowEvent<WindowResizeEventArgs>
 }
 
 pub struct WindowResizeEventArgs {

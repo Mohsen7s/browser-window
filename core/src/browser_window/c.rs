@@ -10,7 +10,10 @@ use std::{
 
 use browser_window_c::*;
 
-use crate::window::WindowImpl;
+use crate::{
+	def_event_c_handler,
+	window::WindowImpl
+};
 
 
 
@@ -36,8 +39,9 @@ pub struct JsEvaluationError {
 	// TODO: Add line and column number files, and perhaps even more info about the JS error
 }
 
-struct UserData {
+struct UserData<'a> {
 	func: ExternalInvocationHandlerFn,
+	events: BrowserWindowEvents<'a>,
 	data: *mut ()
 }
 
@@ -88,6 +92,15 @@ impl BrowserWindowCore for BrowserWindowImpl {
 		unsafe { cbw_BrowserWindow_evalJsThreaded( self.inner, js.into(), Some( ffi_eval_js_callback_handler ), data_ptr as _ ) }
 	}
 
+	fn events<'a>(&'a self) -> &'a BrowserWindowEvents<'a> {
+		unsafe {
+			let data_ptr = (*self.inner).user_data as *mut UserData<'a>;
+			let data = &*data_ptr;
+
+			&data.events
+		}
+	}
+
 	fn navigate( &self, uri: &str ) {
 		unsafe { cbw_BrowserWindow_navigate( self.inner, uri.into() ) };
 	}
@@ -120,6 +133,7 @@ impl BrowserWindowCore for BrowserWindowImpl {
 		// Wrap the callback functions so that they invoke our Rust functions from C
 		let user_data = Box::new( UserData {
 			func: handler,
+			events: BrowserWindowEvents::default(),
 			data: _user_data
 		} );
 		let callback_data = Box::new( CreationCallbackData {
@@ -206,11 +220,13 @@ impl fmt::Display for JsEvaluationError {
 
 unsafe extern "C" fn ffi_creation_callback_handler( bw: *mut cbw_BrowserWindow, _data: *mut c_void ) {
 
+	(*bw).callbacks.on_load = Some(ffi_event_on_load_handler);
+	(*bw).callbacks.on_load_start = Some(ffi_event_blank_handler);
+
 	let data_ptr = _data as *mut CreationCallbackData;
 	let data = Box::from_raw( data_ptr );
 
 	let handle = BrowserWindowImpl { inner: bw };
-
 	(data.func)( handle, data.data );
 }
 
@@ -219,9 +235,50 @@ unsafe extern "C" fn ffi_eval_js_callback_handler( bw: *mut cbw_BrowserWindow, _
 	let data_ptr = _data as *mut EvalJsCallbackData;
 	let data = Box::from_raw( data_ptr );
 
-	let (handle, result) = ffi_eval_js_callback_result( bw, _result, error );
+	let (handle, result) = ffi_eval_js_callback_result(bw, _result, error);
 
 	(data.callback)( handle, data.data, result );
+}
+
+/*unsafe extern "C" fn ffi_event_on_load_handler(bw: *mut cbw_BrowserWindow, http_status_code: u16, error: cbw_Err ) {
+	let data_ptr = (*bw).user_data as *mut UserData;
+	let data = &mut *data_ptr;
+
+	if data.events.on_load.is_registered() {
+		let handle = BrowserWindowImpl { inner: bw };
+
+		let result = if error.code == 0 {
+			Ok(http_status_code)
+		}
+		else {
+			Err(CbwError(error))
+		};
+
+		data.events.on_load.invoke(handle, result);
+	}
+}*/
+
+def_event_c_handler! {
+	on_load(handle: cbw_BrowserWindow as BrowserWindowImpl, http_status_code: u16, error: cbw_Err) {
+
+		if error.code == 0 {
+			Ok(http_status_code)
+		}
+		else {
+			Err(CbwError(error))
+		}
+	}
+}
+
+unsafe extern "C" fn ffi_event_blank_handler(bw: *mut cbw_BrowserWindow) {
+	let data_ptr = (*bw).user_data as *mut UserData;
+	let data = &mut *data_ptr;
+
+	if data.events.on_load_start.is_registered() {
+		let handle = BrowserWindowImpl { inner: bw };
+
+		data.events.on_load_start.invoke(handle, &());
+	}
 }
 
 unsafe extern "C" fn ffi_handler( bw: *mut cbw_BrowserWindow, cmd: cbw_CStrSlice, args: *mut cbw_CStrSlice, arg_count: UsizeFix ) {

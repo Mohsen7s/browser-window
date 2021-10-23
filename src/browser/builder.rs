@@ -38,7 +38,7 @@ struct BrowserUserData {
 	handler: BrowserJsInvocationHandler
 }
 
-/// Used to create a [`BrowserWindow`] or [`BrowserWindowThreaded`] instance, depending on whether or not you have feature `threadsafe` enabled.
+/// Used to create a [`BrowserWindow`] or `BrowserWindowThreaded` instance, depending on whether or not you have feature `threadsafe` enabled.
 /// 
 /// # Warning
 /// `BrowserWindowBuilder` dereferences to `WindowBuilder`, so that you can modify anything related to the window as well.
@@ -115,7 +115,7 @@ impl BrowserWindowBuilder {
 		self.dev_tools = enabled;	self
 	}
 
-	/// Like [`dev_tools`], but only sets dev tools to be enabled (or disabled) if compiling for debug target. 
+	/// Like [`Self::dev_tools`], but only sets dev tools to be enabled (or disabled) if compiling for debug target. 
 	pub fn dev_tools_debug(&mut self, enabled: bool) -> &mut Self {
 		#[cfg(debug_assertions)]
 		self.dev_tools(enabled);

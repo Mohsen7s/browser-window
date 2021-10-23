@@ -8,6 +8,8 @@ pub use c::JsEvaluationError;
 use super::{
 	application::ApplicationImpl,
 	cookie::CookieJarImpl,
+	error::CbwError,
+	event::Event,
 	window::{WindowImpl, WindowOptions}
 };
 
@@ -21,6 +23,13 @@ pub type Source = cbw_BrowserWindowSource;
 pub type CreationCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut () );
 pub type EvalJsCallbackFn = unsafe fn( bw: BrowserWindowImpl, data: *mut (), result: Result<String, JsEvaluationError> ); 
 pub type ExternalInvocationHandlerFn = unsafe fn( bw: BrowserWindowImpl, cmd: &str, args: Vec<String> );
+pub type BrowserWindowEventFn = unsafe fn(bw: BrowserWindowImpl);
+
+#[derive(Default)]
+pub struct BrowserWindowEvents<'a> {
+	on_load: Event<'a, BrowserWindowImpl, Result<u16, CbwError>>,
+	on_load_start: Event<'a, BrowserWindowImpl, ()>
+}
 
 pub trait BrowserWindowCore: Copy {
 
@@ -32,6 +41,9 @@ pub trait BrowserWindowCore: Copy {
 	
 	/// Like `eval_js`, except it can be called from any thread.
 	fn eval_js_threadsafe( &self, js: &str, callback: EvalJsCallbackFn, callback_data: *mut () );
+
+	/// Gives a reference to a struct to set events on
+	fn events<'a>(&'a self) -> &'a BrowserWindowEvents<'a>;
 
 	/// Causes the browser to navigate to the given URI.
 	fn navigate( &self, uri: &str );

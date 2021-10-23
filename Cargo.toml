@@ -17,7 +17,7 @@ default = ["cef"]
 cef = ["browser-window-core/cef"]
 cef-window = ["browser-window-core/cef-window"]
 gtk = ["browser-window-core/gtk"]
-threadsafe = []
+threadsafe = ["browser-window-core/threadsafe"]
 
 [lib]
 name = "browser_window"

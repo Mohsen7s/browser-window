@@ -8,7 +8,7 @@ use std::{
 
 
 #[derive(Debug)]
-pub struct CbwError (cbw_Err);
+pub struct CbwError (pub(in crate) cbw_Err);
 
 
 pub type CbwResult<T> = Result<T, CbwError>;

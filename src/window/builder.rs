@@ -15,7 +15,7 @@ macro_rules! _def_event {
 		$(#[$metas])*
 		#[cfg(not(feature = "threadsafe"))]
 		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) + 'static
+			H: FnMut( WindowHandle, &$args_type ) + 'static
 		{
 			self.events.$name.register( handler );
 			self
@@ -24,7 +24,7 @@ macro_rules! _def_event {
 		$(#[$metas])*
 		#[cfg(feature = "threadsafe")]
 		pub fn $name<H>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) + Send + 'static
+			H: FnMut( WindowHandle, &$args_type ) + Send + 'static
 		{
 			self.events.$name.register( handler );
 			self
@@ -33,7 +33,7 @@ macro_rules! _def_event {
 		$(#[$metas])*
 		#[cfg(not(feature = "threadsafe"))]
 		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) -> F + 'static,
+			H: FnMut( WindowHandle, &$args_type ) -> F + 'static,
 			F: Future<Output=()> + 'static
 		{
 			self.events.$name.register_async( handler );
@@ -43,7 +43,7 @@ macro_rules! _def_event {
 		$(#[$metas])*
 		#[cfg(feature = "threadsafe")]
 		pub fn $name_async<H,F>( &mut self, handler: H ) -> &mut Self where
-			H: FnMut( &$args_type ) -> F + Send + 'static,
+			H: FnMut( WindowHandle, &$args_type ) -> F + Send + 'static,
 			F: Future<Output=()> + 'static
 		{
 			self.events.$name.register_async( handler );
@@ -58,7 +58,7 @@ macro_rules! def_event {
 	};
 	
 	( $(#[$metas:meta])* $name:ident, $name_async:ident ) => {
-		_def_event!( $(#[$metas])*, WindowHandle, $name, $name_async );
+		_def_event!( $(#[$metas])*, (), $name, $name_async );
 	};
 }
 
@@ -66,11 +66,12 @@ macro_rules! def_event {
 
 /// Exposes functionality related to constructing a window.
 pub struct WindowBuilder {
-	pub(in crate) borders: bool,
 	pub(in crate) events: Box<WindowEvents>,
+	pub(in crate) parent: Option<UnsafeSend<WindowHandle>>,
+
+	pub(in crate) borders: bool,
 	pub(in crate) height: Option<u32>,
 	pub(in crate) minimizable: bool,
-	pub(in crate) parent: Option<UnsafeSend<WindowHandle>>,
 	pub(in crate) resizable: bool,
 	pub(in crate) title: Option<String>,
 	pub(in crate) width: Option<u32>
@@ -116,26 +117,31 @@ impl WindowBuilder {
 			resizable: self.resizable
 		};
 
-		// Put event data into a user data pointer
-		let user_data = Box::new( WindowUserData {
-			events: unsafe { Box::from_raw( Box::into_raw( self.events ) ) }	// Move ownership of events into WindowUserData
-		} );
+		match self {
+			Self { events, .. } => {
 
-		// Unwrap the parent ffi handle
-		let parent_impl_handle = match self.parent {
-			None => WindowImpl::default(),
-			Some( parent ) => parent.inner
-		};
+				// Put event data into a user data pointer
+				let user_data = Box::new( WindowUserData {
+					events // Move ownership of events into WindowUserData
+				} );
 
-		let _impl_handle = WindowImpl::new(
-			app.inner,
-			parent_impl_handle,
-			title.into(),
-			self.width as _,
-			self.height as _,
-			&window_options,
-			Box::into_raw( user_data ) as _
-		);
+				// Unwrap the parent ffi handle
+				let parent_impl_handle = match self.parent {
+					None => WindowImpl::default(),
+					Some( p ) => p.inner
+				};
+
+				let _impl_handle = WindowImpl::new(
+					app.inner,
+					parent_impl_handle,
+					title.into(),
+					self.width as _,
+					self.height as _,
+					&window_options,
+					Box::into_raw( user_data ) as _
+				);
+			}
+		}
 	}
 
 	/// Sets the height that the browser window will be created with initially

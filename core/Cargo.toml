@@ -14,6 +14,7 @@ default = ["cef"]
 cef = ["browser-window-c/cef"]
 cef-window = ["browser-window-c/cef-window"]
 gtk = ["browser-window-c/gtk"]
+threadsafe = []
 
 [lib]
 name = "browser_window_core"
@@ -22,4 +23,5 @@ crate-type = ["rlib"]
 
 [dependencies]
 browser-window-c = { path = "../c", version = "0.0.10" }
+concat-idents = "^1.1"
 

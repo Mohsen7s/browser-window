@@ -31,7 +31,7 @@ typedef void (*bw_BrowserWindowJsCallbackFn)( bw_BrowserWindow* window, void* us
 
 
 typedef struct {
-	void (*on_load)(bw_BrowserWindow*, int, bw_Err);
+	void (*on_load)(bw_BrowserWindow*, uint16_t, bw_Err);
 	void (*on_load_start)(bw_BrowserWindow*);
 } bw_BrowserWindowCallbacks;
 
